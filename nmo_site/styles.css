@@ -682,14 +682,14 @@ body.glow-mode.intense {
     border-radius: 8px;
   }
 
+ @media (max-width: 768px) {
   #headline {
-    font-size: 1.6rem;
-    margin-top: 38px;
-    margin-bottom: 8px;
-    max-width: 98vw;
-    text-align: center;
-    letter-spacing: -0.01em;
+    font-size: 2.2rem;
+    margin-top: 44px;
+    margin-bottom: 12px;
+    line-height: 1.08;
   }
+}
 
   #subheadline, .subheadline {
     font-size: 1rem;
