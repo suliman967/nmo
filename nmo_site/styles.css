@@ -1,0 +1,818 @@
+/* styles.css - editable and commented for VS Code
+   Theme: dark red / black. Single hero, desktop non-scrolling.
+   Change colors in :root variables below.
+
+   Glowing mode: enable by adding class="glow-mode" to <body>
+*/
+
+:root{
+  --bg-black: #070606;
+  --deep-red: #2b0000;
+  --accent-red: #c11b1b;
+  --muted-red: #7a1f1f;
+  --text: #ffffff;
+  --glass: rgba(255,255,255,0.04);
+  --glass-2: rgba(255,255,255,0.06);
+
+  /* default subtle glow values (base) */
+  --glow-accent: rgba(255,123,44,0.12);
+  --glow-strong: rgba(193,27,27,0.18);
+  --glow-soft: rgba(255,123,44,0.08);
+  --glow-outline: rgba(255,123,44,0.22);
+}
+
+/* reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%}
+html,body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; height:100%; background:var(--bg-black); color:var(--text);}
+
+/* Prevent scroll on desktop, allow on small screens */
+body{
+  min-height:100vh;
+  overflow:hidden;
+}
+@media (max-width:900px){
+  body{overflow:auto}
+}
+
+/* top transparent bar */
+.topbar{
+  position:fixed;
+  top:0; left:0; right:0;
+  height:72px;
+  padding:0 28px;
+  z-index:40;
+ background: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+   display: flex;
+  justify-content: center; /* centers horizontally */
+  align-items: center;     /* centers vertically */
+}
+.brand{
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:rgba(255,255,255,0.95);
+  font-size:18px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+
+/* === Background / 3D effects === */
+:root{
+  --nmo-bg: #070505;
+  --nmo-deep: #0b0606;
+  --nmo-red: #8b0f0f;     /* deep daark red */
+  --nmo-accent: #ff7b2c;  /* flame highlights */
+  --bg-vignette: rgba(0,0,0,0.55);
+}
+
+/* container */
+.hero {
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(180deg, var(--nmo-deep) 0%, var(--nmo-bg) 60%);
+  perspective: 900px;            /* enables subtle 3D transforms for children */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* background wrapper */
+.flame-bg{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+  transform-style: preserve-3d;
+}
+
+/* particle canvas */
+.flame-canvas{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+  mix-blend-mode: screen; /* makes flames glow over dark background */
+}
+
+/* large 3D layers that extend beyond screen */
+.bg-layer{
+  position: absolute;
+  z-index: 0;
+  will-change: transform, filter, opacity;
+  filter: blur(36px) saturate(110%);
+  opacity: 0.88;
+  transform-origin: center;
+}
+
+/* Layer shapes and placement */
+.layer-1{
+  width: 140vmin;
+  height: 140vmin;
+  left: -30vmin;
+  top: -40vmin;
+  background: radial-gradient(circle at 30% 40%, rgba(139,15,15,0.28), transparent 25%),
+              radial-gradient(circle at 70% 60%, rgba(255,123,44,0.12), transparent 30%);
+  transform: translateZ(-120px) rotate(-20deg);
+}
+
+.layer-2{
+  width: 110vmin;
+  height: 110vmin;
+  right: -40vmin;
+  bottom: -30vmin;
+  background: radial-gradient(circle at 60% 30%, rgba(139,15,15,0.18), transparent 30%),
+              radial-gradient(circle at 20% 70%, rgba(255,239,176,0.08), transparent 35%);
+  transform: translateZ(-60px) rotate(12deg);
+  filter: blur(48px) drop-shadow(0 60px 60px rgba(0,0,0,0.45));
+}
+
+.layer-3{
+  width: 160vmin;
+  height: 160vmin;
+  left: -20vmin;
+  bottom: -70vmin;
+  background: conic-gradient(from 160deg at 50% 50%, rgba(139,15,15,0.06), rgba(0,0,0,0) 40%);
+  transform: translateZ(-240px) rotate(6deg);
+  opacity: 0.78;
+}
+
+/* subtle animated gradient shift */
+@keyframes gradientShift {
+  0% { transform: translateZ(-1px) scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+  50% { transform: translateZ(-1px) scale(1.02) rotate(0.4deg); filter: hue-rotate(6deg); }
+  100% { transform: translateZ(-1px) scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+}
+.bg-layer { animation: gradientShift 18s ease-in-out infinite; }
+
+/* vignette and grain overlays to keep it cinematic */
+.hero::before{
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* over canvas and layers but behind content */
+  background: radial-gradient(60% 60% at 50% 30%, rgba(0,0,0,0) 0%, var(--bg-vignette) 70%);
+  mix-blend-mode: multiply;
+}
+
+/* tiny film grain with low opacity using data URI */
+.hero::after{
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.02' /></svg>");
+  opacity: 0.9;
+  mix-blend-mode: overlay;
+}
+
+/* ensure hero content sits above the background */
+.hero-inner{
+  position: relative;
+  z-index: 10;
+}
+
+/* Respect user reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .bg-layer, .flame-canvas { animation: none; transition: none; }
+}
+
+/* Mobile performance: reduce heavy blur and size */
+@media (max-width: 720px) {
+  .layer-1, .layer-2, .layer-3 { filter: blur(20px); opacity: 0.7; }
+  .flame-canvas { mix-blend-mode: normal; }
+}
+
+
+/* hero */
+.hero{
+  height:100vh;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  /* layered background: black + deep red vignette + subtle noise/dust via radial gradients */
+  background:
+    radial-gradient(60% 60% at 80% 20%, rgba(193,27,27,0.06), transparent 10%),
+    radial-gradient(40% 50% at 20% 80%, rgba(160,18,18,0.07), transparent 12%),
+    linear-gradient(180deg, rgba(0,0,0,0.85), rgba(12,0,0,0.96));
+}
+
+.brand-image {
+  display: block;
+  margin: 35px auto -90px auto;
+  width: 80px;
+  height: auto;
+  border-radius: 12px;
+  background: transparent;
+
+}
+
+/* headline */
+#headline{
+  font-size: clamp(28px, 4.6vw, 56px);
+  line-height:1.02;
+  letter-spacing:-0.02em;
+  color:var(--text);
+  font-weight:800;
+  text-shadow: 0 6px 30px rgba(0,0,0,0.6), 0 1px 0 rgba(0,0,0,0.3);
+  max-width:900px;
+  margin-top:80px;
+}
+
+/* subheadline */
+#subheadline{
+  font-size: clamp(14px, 1.6vw, 20px);
+  color: rgba(255,255,255,0.88);
+  max-width:720px;
+  opacity:0.95;
+  margin-top: 10px;
+}
+
+/* convertkit wrapper: force dark theme & compact look */
+.ck-wrapper{ margin-top:18px; width:100%; display:flex; justify-content:center; z-index:35; }
+.ck-wrapper .formkit-form{
+  max-width:640px;
+  width:100%;
+  /* Remove border, background, radius, and shadow */
+  border-radius:0;
+  border:none;
+  background:none;
+  box-shadow:none;
+  padding:32px 24px 24px 24px; /* More space around content */
+  margin-top:-15px; /* Extra space above form */
+}
+
+/* override ConvertKit default internal styles for dark look */
+.ck-wrapper .formkit-header h2{ color:var(--text); font-size:20px; margin-bottom:18px; text-align:center; }
+.ck-wrapper .formkit-subheader{ color: rgba(255,255,255,0.8); text-align:center; margin-top:8px; margin-bottom:18px; font-size:15px; }
+.ck-wrapper .formkit-fields{ display:flex; gap:16px; align-items:center; justify-content:center; margin-top:18px; flex-wrap:wrap; }
+.ck-wrapper .formkit-input{
+  padding:12px 14px;
+  background: rgba(255,255,255,0.06);
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:8px;
+  min-width:220px;
+  font-size:15px;
+  outline:none;
+}
+.ck-wrapper .formkit-input::placeholder{ color: rgba(255,255,255,0.6); }
+
+.ck-wrapper .formkit-submit{
+  padding:0;
+  border-radius:8px;
+  overflow:hidden;
+  min-width:140px;
+  border:0;
+  background: linear-gradient(180deg, var(--accent-red), var(--muted-red));
+  box-shadow: 0 8px 20px rgba(193,27,27,0.28), 0 2px 0 rgba(0,0,0,0.4) inset;
+  cursor:pointer;
+  font-weight:700;
+}
+.ck-wrapper .formkit-submit span{ padding:12px 22px; display:inline-block; color:#fff; font-size:15px; }
+.ck-wrapper .formkit-guarantee{ margin-top:18px; color: rgba(255,255,255,0.6); font-size:13px; }
+/* powered by small */
+.ck-wrapper .formkit-powered-by-convertkit{ color: rgba(255,255,255,0.55); font-size:12px; display:inline-block; margin-top:14px; opacity:0.9; }
+
+/* ...existing code... */
+.social-icons-glow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 36px;
+  margin-bottom: -20px;
+  margin-top: 10px;
+  z-index: 20;
+}
+
+.icon-link {
+  display: inline-block;
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.icon-x-glow, .icon-instagram-glow {
+  filter: drop-shadow(0 0 18px #ff7b2c88) drop-shadow(0 0 8px #c11b1b88);
+  transition: filter 0.22s;
+}
+
+.icon-link:hover .icon-x-glow,
+.icon-link:focus .icon-x-glow,
+.icon-link:hover .icon-instagram-glow,
+.icon-link:focus .icon-instagram-glow {
+  filter: drop-shadow(0 0 32px #ff7b2c) drop-shadow(0 0 18px #c11b1b);
+  transform: scale(1.08);
+}
+
+/* Glow mode: boost icon glow */
+body.glow-mode .icon-x-glow,
+body.glow-mode .icon-instagram-glow {
+  filter: drop-shadow(0 0 36px #ff7b2c) drop-shadow(0 0 18px #c11b1b);
+  opacity: 0.98;
+}
+
+/* ...existing code... */
+
+/* copyright */
+.copyright{
+  margin-top:16px;
+  color: rgba(255,255,255,0.6);
+  font-size:13px;
+}
+
+/* SHORT: decorative pieces area */
+.decor{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:10;
+}
+
+/* piece base styling */
+.piece{
+  position:absolute;
+  will-change:transform,opacity;
+  mix-blend-mode:screen;
+  opacity:0.85;
+  transform-style:preserve-3d;
+}
+
+/* size and positions: adjust here to add/remove pieces */
+.p1{ width:240px; height:auto; left:6%; top:18%; transform:rotateY(18deg) rotateZ(-6deg) scale(1.05) translateZ(30px); opacity:0.95; }
+.p2{ width:160px; height:auto; right:8%; top:12%; transform:rotateY(-14deg) rotateZ(10deg) scale(0.9) translateZ(18px); opacity:0.9; }
+.p3{ width:380px; height:auto; right:12%; bottom:6%; transform:rotateY(10deg) rotateZ(-10deg) scale(1.08) translateZ(40px); opacity:0.9; }
+
+/* SVG pieces scale to container */
+.svg-piece{ width:100%; height:auto; display:block; filter:drop-shadow(0 30px 40px rgba(0,0,0,0.75)); }
+
+/* subtle animation to create life */
+@keyframes floaty {
+  0%{ transform: translateY(0) }
+  50%{ transform: translateY(-8px) }
+  100%{ transform: translateY(0) }
+}
+.p1{ animation: floaty 6s ease-in-out infinite; }
+.p2{ animation: floaty 5.2s ease-in-out infinite; }
+.p3{ animation: floaty 7s ease-in-out infinite; }
+
+/* responsive tweaks */
+@media (max-width:900px){
+  .hero-inner{ padding:90px 20px; }
+  .p1,.p2,.p3{ opacity:0.7; transform:none; position:fixed; width:100px; }
+  .p1{ left:6%; top:8%; }
+  .p2{ right:8%; top:8%; }
+  .p3{ left:50%; bottom:6%; transform:translateX(-50%); }
+}
+
+/* ...existing code... */
+.side-glow {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  width: 220px;
+  height: 80%;
+  pointer-events: none;
+  z-index: 12; /* Above background, below content */
+  opacity: 0.12;
+  mix-blend-mode: screen;
+  border-radius: 50%;
+}
+
+.left-glow {
+  left: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(255,123,44,0.22) 0%, rgba(255,123,44,0.08) 40%, transparent 80%);
+}
+
+.right-glow {
+  right: 0;
+  background: radial-gradient(circle at 70% 50%, rgba(193,27,27,0.18) 0%, rgba(193,27,27,0.08) 40%, transparent 80%);
+}
+
+/* On mobile, reduce glow width and intensity */
+@media (max-width: 720px) {
+  .side-glow { width: 80px; opacity: 0.10; }
+}
+/* ...existing code... */
+
+/* Accessibility: focus styles */
+.formkit-input:focus, .formkit-submit:focus{ outline: 3px solid rgba(193,27,27,0.25); outline-offset:2px; }
+
+/* ...existing code... */
+.flame-bg {
+  position: absolute;
+  left: 50%;
+  top: 68%;
+  transform: translate(-30%, -30%);
+  z-index: 05;
+  pointer-events: none;
+  opacity: 0.20;
+  filter: blur(1.2px) drop-shadow(0 0 14px #ff7b2c88);
+  width: 54px;
+  height: 100px;
+  animation: flameFloat 1s ease-in-out infinite;
+}
+
+.flame-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ...existing code... */
+#flame-canvas {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.22;
+  mix-blend-mode: lighten;
+}
+/* ...existing code... */
+
+@keyframes flameFloat {
+  0%   { transform: translate(-50%, -50%) scaleY(1); }
+  45%  { transform: translate(-50%, -52%) scaleY(1.04); }
+  55%  { transform: translate(-50%, -48%) scaleY(0.98); }
+  100% { transform: translate(-50%, -50%) scaleY(1); }
+}
+/* ...existing code... */
+.hero-inner{
+  z-index:30;
+  max-width:980px;
+  width:100%;
+  padding:110px 28px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;
+}
+
+/* ===========================
+   GLOW MODE (toggle with body.glow-mode)
+   =========================== */
+body.glow-mode {
+  --glow-accent: rgba(255,123,44,0.14);
+  --glow-strong: rgba(193,27,27,0.28);
+  --glow-soft: rgba(255,123,44,0.12);
+  --glow-outline: rgba(255,123,44,0.32);
+  /* slightly brighten background */
+  background: radial-gradient(circle at 20% 10%, rgba(139,15,15,0.02), transparent 10%), var(--bg-black);
+}
+
+/* stronger, colored vignette to make glows pop */
+body.glow-mode .hero::before{
+  background: radial-gradient(60% 60% at 50% 30%, rgba(255,90,40,0.03), rgba(0,0,0,0.55) 70%);
+  mix-blend-mode: screen;
+  opacity: 0.95;
+}
+
+/* boost layer saturation and add external glow */
+body.glow-mode .bg-layer {
+  filter: blur(40px) saturate(140%) contrast(102%) drop-shadow(0 40px 60px var(--glow-soft));
+  opacity: 0.98;
+}
+
+/* add animated halo and subtle movement to layers */
+body.glow-mode .layer-1,
+body.glow-mode .layer-2,
+body.glow-mode .layer-3 {
+  animation-duration: 14s;
+  transition: transform 600ms ease, opacity 400ms ease;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+
+/* glow pulse keyframe */
+@keyframes glowPulse {
+  0% { filter: drop-shadow(0 0 0 rgba(255,123,44,0.0)); transform: translateZ(0) scale(1); }
+  50% { filter: drop-shadow(0 0 36px var(--glow-accent)); transform: translateZ(10px) scale(1.01); }
+  100% { filter: drop-shadow(0 0 0 rgba(255,123,44,0.0)); transform: translateZ(0) scale(1); }
+}
+
+/* apply pulse to selected layers */
+body.glow-mode .layer-2 { animation-name: gradientShift, glowPulse; animation-duration: 18s, 5.6s; animation-timing-function: ease-in-out, ease-in-out; animation-iteration-count: infinite, infinite; }
+body.glow-mode .layer-1 { animation-name: gradientShift, glowPulse; animation-duration: 18s, 6.8s; animation-delay: 0s, 0.6s; animation-iteration-count: infinite, infinite; }
+
+/* flame area gets stronger glow, color bloom */
+body.glow-mode .flame-bg {
+  filter: blur(2.6px) drop-shadow(0 0 28px var(--glow-outline));
+  opacity: 0.85;
+  transform: translate(-30%, -30%) scale(1.06);
+  animation-duration: 1.6s;
+}
+
+/* flame svg outer bloom and internal color boost */
+body.glow-mode .flame-svg path,
+body.glow-mode .flame-svg ellipse {
+  filter: drop-shadow(0 16px 36px rgba(255,123,44,0.18));
+  transition: filter 320ms ease, transform 320ms ease;
+}
+
+/* a translucent halo behind the hero-inner to push the content forward */
+body.glow-mode .hero-inner::before{
+  content: "";
+  position: absolute;
+  inset: -6%;
+  z-index: 9;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, rgba(255,123,44,0.02), transparent 30%);
+  filter: blur(28px) saturate(120%);
+  opacity: 1;
+}
+
+/* brand glow */
+body.glow-mode .brand{
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.6),
+    0 6px 26px rgba(139,15,15,0.18),
+    0 0 12px rgba(255,123,44,0.08);
+  color: #fff;
+}
+
+/* headline stronger glow and warm rim light */
+body.glow-mode #headline{
+  text-shadow:
+    0 8px 40px rgba(0,0,0,0.6),
+    0 1px 0 rgba(0,0,0,0.3),
+    0 0 28px rgba(255,123,44,0.12);
+}
+
+/* inputs get subtle inner glow and brighter border */
+body.glow-mode .ck-wrapper .formkit-input{
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,123,44,0.14);
+  box-shadow: inset 0 0 18px rgba(255,123,44,0.02), 0 6px 20px rgba(0,0,0,0.45);
+  transition: box-shadow 240ms ease, border-color 240ms ease, transform 240ms ease;
+}
+body.glow-mode .ck-wrapper .formkit-input:focus{
+  border-color: var(--glow-outline);
+  box-shadow: inset 0 0 28px rgba(255,123,44,0.06), 0 10px 40px rgba(255,78,20,0.06);
+  transform: translateY(-2px);
+}
+
+/* submit button gets halo + animated sheen */
+body.glow-mode .ck-wrapper .formkit-submit{
+  position: relative;
+  background: linear-gradient(180deg, #ff8b43, #b21a1a);
+  box-shadow: 0 14px 40px rgba(178,26,26,0.28), 0 0 40px rgba(255,123,44,0.12);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  overflow: visible;
+}
+body.glow-mode .ck-wrapper .formkit-submit::after{
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: 10px;
+  filter: blur(18px);
+  background: radial-gradient(circle at 50% 30%, rgba(255,123,44,0.12), transparent 30%);
+  opacity: 0.95;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+}
+body.glow-mode .ck-wrapper .formkit-submit:hover{
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 22px 56px rgba(178,26,26,0.36), 0 0 60px rgba(255,123,44,0.2);
+}
+
+/* subtle moving sheen on the button */
+@keyframes sheen {
+  0% { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+body.glow-mode .ck-wrapper .formkit-submit span{
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 100%);
+  background-size: 240% 100%;
+  animation: sheen 3.4s linear infinite;
+  display:inline-block;
+}
+
+/* flame canvas extra particles glow */
+body.glow-mode #flame-canvas { opacity: 0.5; filter: drop-shadow(0 10px 30px rgba(255,123,44,0.14)) saturate(130%); mix-blend-mode: screen; }
+
+/* decorative pieces add warm glow */
+body.glow-mode .piece { filter: drop-shadow(0 24px 40px rgba(255,95,40,0.08)); }
+
+/* hero after grain overlay gets warm tint */
+body.glow-mode .hero::after{
+  mix-blend-mode: overlay;
+  opacity: 0.65;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.02' /></svg>");
+}
+
+/* reduce intensity on small screens for performance */
+@media (max-width: 720px) {
+  body.glow-mode .bg-layer, body.glow-mode .flame-bg, body.glow-mode .layer-2 { filter: blur(18px) saturate(120%); opacity:0.7; }
+  body.glow-mode .ck-wrapper .formkit-submit::after { display:none; }
+  body.glow-mode .hero-inner::before{ display:none; }
+  body.glow-mode .flame-bg { opacity:0.6; transform: translate(-30%, -30%) scale(0.98); }
+}
+
+/* respect reduced motion: remove pulsing and sheen */
+@media (prefers-reduced-motion: reduce) {
+  body.glow-mode .layer-1, body.glow-mode .layer-2, body.glow-mode .flame-bg,
+  body.glow-mode .ck-wrapper .formkit-submit span { animation: none !important; transition: none !important; }
+  body.glow-mode .ck-wrapper .formkit-submit::after { display: none; }
+}
+
+/* tiny utility: quick toggle class when you want ultra-intense glow for screenshots */
+body.glow-mode.intense {
+  --glow-accent: rgba(255,123,44,0.22);
+  --glow-strong: rgba(193,27,27,0.42);
+  --glow-outline: rgba(255,123,44,0.44);
+  filter: saturate(1.04);
+}
+
+/* --- Modern mobile improvements --- */
+@media (max-width: 768px) {
+  html, body {
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--bg-black);
+  }
+
+  @media (max-width: 768px) {
+  .topbar {
+    justify-content: center !important;
+    text-align: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .brand {
+    margin: 0 auto;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+    width: 100%;
+    display: block;
+  }
+}
+
+  .hero {
+    min-height: 100vh;
+    padding-top: 56px;
+    padding-bottom: 24px;
+    background: linear-gradient(180deg, var(--nmo-deep) 0%, var(--nmo-bg) 80%);
+    justify-content: flex-start;
+  }
+
+  .hero-inner {
+    padding: 36px 10px 24px 10px;
+    max-width: 98vw;
+    gap: 16px;
+    border-radius: 18px;
+    background: rgba(12,0,0,0.82);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.18);
+    margin: 0 auto;
+  }
+
+  .brand-image {
+    width: 54px;
+    margin: 18px auto -38px auto;
+    border-radius: 8px;
+  }
+
+  #headline {
+    font-size: 1.6rem;
+    margin-top: 38px;
+    margin-bottom: 8px;
+    max-width: 98vw;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+
+  #subheadline, .subheadline {
+    font-size: 1rem;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    text-align: center;
+    max-width: 96vw;
+    opacity: 0.95;
+  }
+
+  .ck-wrapper {
+    margin-top: 12px;
+    padding: 0 2px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .ck-wrapper .formkit-form {
+    padding: 18px 8px 12px 8px;
+    margin-top: 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 18px rgba(0,0,0,0.10);
+    background: rgba(12,0,0,0.92);
+  }
+  .ck-wrapper .formkit-header h2 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+  .ck-wrapper .formkit-subheader {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  .ck-wrapper .formkit-fields {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: stretch;
+  }
+  .ck-wrapper .formkit-input {
+    min-width: 0;
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+  }
+  .ck-wrapper .formkit-submit {
+    min-width: 0;
+    width: 100%;
+    font-size: 1rem;
+    border-radius: 10px;
+    margin-top: 6px;
+    padding: 0;
+  }
+  .ck-wrapper .formkit-submit span {
+    padding: 12px 0;
+    width: 100%;
+    display: block;
+    font-size: 1rem;
+  }
+  .ck-wrapper .formkit-guarantee {
+    font-size: 0.85rem;
+    margin-top: 10px;
+  }
+  .ck-wrapper .formkit-powered-by-convertkit {
+    font-size: 0.8rem;
+    margin-top: 8px;
+  }
+
+  .social-icons-glow {
+    gap: 22px;
+    margin-bottom: -8px;
+    margin-top: 8px;
+  }
+  .icon-x-glow, .icon-instagram-glow {
+    font-size: 22px !important;
+    width: 22px;
+    height: 22px;
+  }
+  .icon-link {
+    padding: 2px;
+    border-radius: 8px;
+    transition: background 0.18s;
+  }
+  .icon-link:active, .icon-link:focus {
+    background: rgba(255,123,44,0.08);
+  }
+
+  .copyright {
+    margin-top: 18px;
+    font-size: 0.85rem;
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  /* Decorative pieces: hide for mobile clarity */
+  .decor, .piece, .svg-piece {
+    display: none !important;
+  }
+
+  /* Side glows: reduce size and intensity */
+  .side-glow {
+    width: 38px;
+    opacity: 0.08;
+    top: 8%;
+    bottom: 8%;
+  }
+
+  /* Flame background SVG: reposition and scale for mobile */
+  .flame-bg {
+    left: 50%;
+    top: 74%;
+    width: 32px;
+    height: 60px;
+    opacity: 0.18;
+    filter: blur(0.8px) drop-shadow(0 0 8px #ff7b2c88);
+    transform: translate(-50%, -50%);
+  }
+  .flame-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  #flame-canvas {
+    opacity: 0.18;
+    mix-blend-mode:
